@@ -28,6 +28,12 @@ function aplicarZoom(nivel) {
 
 function autoZoom() {
   const c = document.getElementById('puntuacion-container');
+  // En tablet (≥600px) no se auto-zoom: el body hace scroll horizontal como una unidad.
+  // Solo se auto-zoom en teléfonos muy pequeños donde el layout sería inutilizable.
+  if (window.innerWidth >= 600) {
+    c.style.zoom = zoomLevel;
+    return;
+  }
   c.style.zoom = '';
   requestAnimationFrame(() => {
     const cStyle = getComputedStyle(c);
@@ -35,9 +41,7 @@ function autoZoom() {
     const marginL = parseFloat(cStyle.marginLeft) || 0;
     const marginR = parseFloat(cStyle.marginRight) || 0;
     const bodyPadR = parseFloat(bodyStyle.paddingRight) || 0;
-    // Porción escalable: container + sus márgenes (todo esto se reduce con zoom)
     const scalable = marginL + c.scrollWidth + marginR;
-    // Espacio disponible: viewport menos el padding fijo del body
     const available = window.innerWidth - bodyPadR;
     if (scalable > available) {
       zoomLevel = Math.max(ZOOM_MIN, parseFloat((available / scalable).toFixed(2)));
