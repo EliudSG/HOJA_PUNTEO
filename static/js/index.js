@@ -13,9 +13,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let filaValoresPreguntaInputs = [];
   let mostrarColumnaT = false;
+  let zoomLevel = 1.0;
+  const ZOOM_STEP = 0.1;
+  const ZOOM_MIN = 0.3;
 
 function sanitizeFileName(name) {
   return name.replace(/[\/\\:*?"<>|]/g, '').replace(/\s+/g, '_');
+}
+
+function aplicarZoom(nivel) {
+  zoomLevel = Math.max(ZOOM_MIN, Math.min(1.0, nivel));
+  document.getElementById('puntuacion-container').style.zoom = zoomLevel;
+}
+
+function autoZoom() {
+  const c = document.getElementById('puntuacion-container');
+  c.style.zoom = '';
+  requestAnimationFrame(() => {
+    const rect = c.getBoundingClientRect();
+    const side = document.querySelector('.contenedor-botones-laterales');
+    const sideLeft = side ? side.getBoundingClientRect().left : window.innerWidth - 80;
+    const available = sideLeft - rect.left - 8;
+    const natural = c.scrollWidth;
+    if (natural > available) {
+      zoomLevel = Math.max(ZOOM_MIN, parseFloat((available / natural).toFixed(2)));
+      c.style.zoom = zoomLevel;
+    } else {
+      zoomLevel = 1.0;
+      c.style.zoom = 1;
+    }
+  });
 }
 
 function capturarCompleto() {
@@ -179,7 +206,23 @@ function crearBotonTotal() {
     actualizarTotalesFila();
   });
 
+  const btnZoomOut = document.createElement("button");
+  btnZoomOut.textContent = "−";
+  btnZoomOut.title = "Reducir";
+  btnZoomOut.classList.add("boton-total");
+  btnZoomOut.style.cssText = "min-width:32px;font-size:1.1rem;";
+  btnZoomOut.addEventListener("click", () => aplicarZoom(zoomLevel - ZOOM_STEP));
+
+  const btnZoomIn = document.createElement("button");
+  btnZoomIn.textContent = "+";
+  btnZoomIn.title = "Ampliar";
+  btnZoomIn.classList.add("boton-total");
+  btnZoomIn.style.cssText = "min-width:32px;font-size:1.1rem;";
+  btnZoomIn.addEventListener("click", () => aplicarZoom(zoomLevel + ZOOM_STEP));
+
   contenedorBotones.appendChild(wrapperCaptura);
+  contenedorBotones.appendChild(btnZoomOut);
+  contenedorBotones.appendChild(btnZoomIn);
   contenedorBotones.appendChild(botonTotal);
   document.body.appendChild(contenedorBotones);
 }
@@ -1137,6 +1180,9 @@ document.addEventListener('keydown', (e) => {
     if (botonF) botonF.click();
   }
 });
+
+autoZoom();
+window.addEventListener('resize', autoZoom);
 
 document.querySelector('.boton-faltas').addEventListener('click', () => {
   if (!celdaSeleccionada) return;

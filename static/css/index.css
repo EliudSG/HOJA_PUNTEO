@@ -40,7 +40,6 @@ body {
   align-items: center;
   white-space: nowrap;
   flex-wrap: nowrap;
-  overflow-x: auto;
 }
 
 .nombre-input {
