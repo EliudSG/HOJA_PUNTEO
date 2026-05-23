@@ -21,6 +21,7 @@ body {
 #puntuacion-container {
   display: flex;
   flex-direction: column;
+  position: relative;
   margin-left: 35px;
   margin-right: 120px; /* espacio para los botones laterales */
   gap: 6px;
@@ -94,6 +95,11 @@ body {
   outline: none !important;
   position: relative;
   z-index: 10;
+}
+
+.celda.fila-activa:not(.selected),
+.celda.columna-activa:not(.selected) {
+  background-color: #d4d4d4;
 }
 
 .celda:focus {
@@ -302,6 +308,93 @@ input::placeholder {
   letter-spacing: 0.5px;
   text-align: center;
   border-bottom: 4px solid rgb(230, 151, 151);
+}
+
+/* ── Contador regresivo de preguntas ── */
+#contador-preguntas {
+  position: absolute;
+  bottom: -14px;
+  right: 20px;
+  font-size: 0.70rem;
+  color: #bbb;
+  pointer-events: none;
+  z-index: 100;
+  letter-spacing: 0.2px;
+  font-family: Arial, sans-serif;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* ── Modal reinicio ── */
+#modal-reinicio {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+}
+
+.modal-caja {
+  background: white;
+  border-radius: 12px;
+  padding: 28px 32px;
+  max-width: 320px;
+  width: 88%;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.modal-caja h3 {
+  margin: 0 0 10px;
+  font-size: 1.1rem;
+  color: #222;
+}
+
+.modal-caja p {
+  font-size: 0.88rem;
+  color: #666;
+  margin: 0 0 22px;
+  line-height: 1.5;
+}
+
+.modal-botones {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.modal-btn-confirmar {
+  padding: 9px 20px;
+  background: #d93025;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.modal-btn-confirmar:hover {
+  background: #b71c1c;
+}
+
+.modal-btn-cancelar {
+  padding: 9px 20px;
+  background: #f0f0f0;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.modal-btn-cancelar:hover {
+  background: #e0e0e0;
 }
 
 /* ── Menú desplegable de descarga ── */

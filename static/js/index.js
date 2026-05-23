@@ -24,6 +24,7 @@ function sanitizeFileName(name) {
 function aplicarZoom(nivel) {
   zoomLevel = Math.max(ZOOM_MIN, Math.min(1.0, nivel));
   document.getElementById('puntuacion-container').style.zoom = zoomLevel;
+  posicionarContador();
 }
 
 function autoZoom() {
@@ -228,10 +229,43 @@ function crearBotonTotal() {
   btnZoomIn.style.cssText = "min-width:32px;font-size:1.1rem;";
   btnZoomIn.addEventListener("click", () => aplicarZoom(zoomLevel + ZOOM_STEP));
 
+  const botonReinicio = document.createElement("button");
+  botonReinicio.title = "Nueva partida";
+  botonReinicio.classList.add("boton-total");
+  botonReinicio.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#555" viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>`;
+
+  const modalReinicio = document.createElement("div");
+  modalReinicio.id = "modal-reinicio";
+  modalReinicio.innerHTML = `
+    <div class="modal-caja">
+      <h3>¿Reiniciar partida?</h3>
+      <p>Se perderá todo el contenido actual.<br>Esta acción no se puede deshacer.</p>
+      <div class="modal-botones">
+        <button class="modal-btn-confirmar">Sí, reiniciar</button>
+        <button class="modal-btn-cancelar">Cancelar</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modalReinicio);
+
+  botonReinicio.addEventListener("click", () => {
+    modalReinicio.style.display = "flex";
+  });
+  modalReinicio.querySelector(".modal-btn-confirmar").addEventListener("click", () => {
+    location.reload();
+  });
+  modalReinicio.querySelector(".modal-btn-cancelar").addEventListener("click", () => {
+    modalReinicio.style.display = "none";
+  });
+  modalReinicio.addEventListener("click", (e) => {
+    if (e.target === modalReinicio) modalReinicio.style.display = "none";
+  });
+
   contenedorBotones.appendChild(wrapperCaptura);
   contenedorBotones.appendChild(btnZoomOut);
   contenedorBotones.appendChild(btnZoomIn);
   contenedorBotones.appendChild(botonTotal);
+  contenedorBotones.appendChild(botonReinicio);
   document.body.appendChild(contenedorBotones);
 }
 
@@ -422,18 +456,38 @@ function crearFilaNumeros() {
 function seleccionarCelda(celda) {
   if (!celda) return;
 
-  document.querySelectorAll('.celda').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.celda').forEach(c =>
+    c.classList.remove('selected', 'fila-activa', 'columna-activa')
+  );
 
   celdaSeleccionada = celda;
 
-  if (celda.classList.contains('nombre-input') || 
-      celda.classList.contains('nombre-equipo-verde') || 
+  if (celda.classList.contains('nombre-input') ||
+      celda.classList.contains('nombre-equipo-verde') ||
       celda.classList.contains('nombre-equipo-rojo')) {
     celda.focus();
-    return; 
+    return;
   }
+
   celda.classList.add('selected');
   celda.focus();
+
+  const filaDiv = celda.parentElement;
+  if (!filaDiv) return;
+
+  // Highlight row
+  filaDiv.querySelectorAll('.celda').forEach(c => {
+    if (c !== celda) c.classList.add('fila-activa');
+  });
+
+  // Highlight column (same position across all .fila divs)
+  const pos = Array.from(filaDiv.children).indexOf(celda);
+  document.querySelectorAll('.fila').forEach(fila => {
+    const c = fila.children[pos];
+    if (c && c !== celda && c.classList.contains('celda')) {
+      c.classList.add('columna-activa');
+    }
+  });
 }
 
   crearBotonTotal();
@@ -862,6 +916,7 @@ if (indexVAL !== -1) {
     celdaSeleccionada.value = nuevo;
     celdaSeleccionada.style.backgroundColor = tieneFalta ? "#ffb3b3" : "";
   }
+  actualizarContadorPreguntas();
   seleccionarCelda(celdaSeleccionada);
   return;
 }
@@ -942,7 +997,9 @@ document.querySelector('.borrar-btn').addEventListener('click', () => {
     celdaSeleccionada.value = '';
     celdaSeleccionada.classList.remove('contorno-rojo');
     celdaSeleccionada.style.backgroundColor = '';
-    celdaSeleccionada.readOnly = true; // Mantener como solo lectura
+    celdaSeleccionada.removeAttribute('data-valor-base');
+    celdaSeleccionada.readOnly = true;
+    actualizarContadorPreguntas();
     seleccionarCelda(celdaSeleccionada);
     return;
   }
@@ -1190,7 +1247,39 @@ document.addEventListener('keydown', (e) => {
 });
 
 autoZoom();
-window.addEventListener('resize', autoZoom);
+window.addEventListener('resize', () => { autoZoom(); posicionarContador(); });
+
+const DIST_PREGUNTAS = { 10: 8, 20: 9, 30: 3 };
+const contadorPreguntas = document.createElement('div');
+contadorPreguntas.id = 'contador-preguntas';
+container.appendChild(contadorPreguntas);
+
+function actualizarContadorPreguntas() {
+  const usados = { 10: 0, 20: 0, 30: 0 };
+  filaValoresPreguntaInputs.slice(0, 20).forEach(c => {
+    const v = parseInt(c.dataset.valorBase);
+    if (v in usados) usados[v]++;
+  });
+  contadorPreguntas.textContent = [10, 20, 30]
+    .map(v => `${v}pts: ${DIST_PREGUNTAS[v] - usados[v]}`)
+    .join('   ·   ');
+}
+
+function posicionarContador() {
+  requestAnimationFrame(() => {
+    const primeraFila = container.querySelector('.fila');
+    if (!primeraFila) return;
+    const celdas = primeraFila.querySelectorAll('.celda');
+    if (!celdas.length) return;
+    const celdaT = celdas[celdas.length - 1];
+    const rectCelda = celdaT.getBoundingClientRect();
+    const rectContainer = container.getBoundingClientRect();
+    contadorPreguntas.style.right = Math.round(rectContainer.right - rectCelda.right) + 'px';
+  });
+}
+
+actualizarContadorPreguntas();
+posicionarContador();
 
 document.querySelector('.boton-faltas').addEventListener('click', () => {
   if (!celdaSeleccionada) return;
