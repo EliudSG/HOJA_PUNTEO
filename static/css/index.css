@@ -103,7 +103,8 @@ body {
 #botones {
   position: fixed;
   bottom: 20px;
-  right: 20px;
+  left: 20px;
+  right: auto;
   display: flex;
   gap: 12px;
   background: #222;
@@ -225,13 +226,14 @@ input::placeholder {
   position: fixed;
   top: 50%;
   right: 10px;
-  transform: translateY(-50%);
+  transform: translateY(-50%) translateZ(0);
   display: flex;
   flex-direction: column;
   gap: 40px;
   z-index: 10000;
   background-color: transparent;
   pointer-events: auto;
+  will-change: transform;
 }
 
 .grupo-botones {
@@ -262,6 +264,8 @@ input::placeholder {
   flex-direction: row;
   gap: 10px;
   align-items: center;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .boton-total,
@@ -341,7 +345,7 @@ input::placeholder {
   #puntuacion-container {
     min-width: 700px;
     margin-left: 5px;
-    margin-right: 85px;
+    margin-right: 72px;
     padding: 12px;
     gap: 4px;
   }
@@ -365,13 +369,17 @@ input::placeholder {
     font-size: 0.70rem;
   }
   .columna-botones {
-    margin: 0 5px;
+    margin: 0 3px;
   }
   .boton-lateral {
     width: 32px;
     height: 38px;
     font-size: 12px;
     padding: 4px 5px;
+  }
+  .contenedor-botones-laterales {
+    gap: 15px;
+    right: 6px;
   }
 }
 
@@ -384,7 +392,7 @@ input::placeholder {
   #puntuacion-container {
     min-width: 620px;
     margin-left: 4px;
-    margin-right: 80px;
+    margin-right: 66px;
     padding: 10px;
     gap: 3px;
   }
@@ -408,12 +416,16 @@ input::placeholder {
     font-size: 0.65rem;
   }
   .columna-botones {
-    margin: 0 4px;
+    margin: 0 2px;
   }
   .boton-lateral {
     width: 28px;
     height: 34px;
     font-size: 11px;
     padding: 3px 4px;
+  }
+  .contenedor-botones-laterales {
+    gap: 12px;
+    right: 5px;
   }
 }
