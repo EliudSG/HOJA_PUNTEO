@@ -30,13 +30,17 @@ function autoZoom() {
   const c = document.getElementById('puntuacion-container');
   c.style.zoom = '';
   requestAnimationFrame(() => {
-    const rect = c.getBoundingClientRect();
-    const side = document.querySelector('.contenedor-botones-laterales');
-    const sideLeft = side ? side.getBoundingClientRect().left : window.innerWidth - 80;
-    const available = sideLeft - rect.left - 8;
-    const natural = c.scrollWidth;
-    if (natural > available) {
-      zoomLevel = Math.max(ZOOM_MIN, parseFloat((available / natural).toFixed(2)));
+    const cStyle = getComputedStyle(c);
+    const bodyStyle = getComputedStyle(document.body);
+    const marginL = parseFloat(cStyle.marginLeft) || 0;
+    const marginR = parseFloat(cStyle.marginRight) || 0;
+    const bodyPadR = parseFloat(bodyStyle.paddingRight) || 0;
+    // Porción escalable: container + sus márgenes (todo esto se reduce con zoom)
+    const scalable = marginL + c.scrollWidth + marginR;
+    // Espacio disponible: viewport menos el padding fijo del body
+    const available = window.innerWidth - bodyPadR;
+    if (scalable > available) {
+      zoomLevel = Math.max(ZOOM_MIN, parseFloat((available / scalable).toFixed(2)));
       c.style.zoom = zoomLevel;
     } else {
       zoomLevel = 1.0;

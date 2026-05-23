@@ -27,7 +27,7 @@ body {
   padding: 20px;
   background: white;
   border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: none;
   box-sizing: border-box;
 }
 
@@ -351,14 +351,14 @@ input::placeholder {
     gap: 3px;
   }
   .nombre-input {
-    width: 58px !important;
-    min-width: 58px !important;
+    width: 80px !important;
+    min-width: 80px !important;
     font-size: 0.70rem;
     padding: 4px 3px;
   }
   .totales-label {
-    width: 58px !important;
-    min-width: 58px !important;
+    width: 80px !important;
+    min-width: 80px !important;
     font-size: 0.70rem;
   }
   .columna-botones {
@@ -379,7 +379,7 @@ input::placeholder {
     align-items: flex-start;
   }
   #puntuacion-container {
-    min-width: 640px;
+    min-width: 620px;
     margin-left: 4px;
     margin-right: 80px;
     padding: 10px;
@@ -394,14 +394,14 @@ input::placeholder {
     gap: 2px;
   }
   .nombre-input {
-    width: 52px !important;
-    min-width: 52px !important;
+    width: 80px !important;
+    min-width: 80px !important;
     font-size: 0.65rem;
     padding: 3px 2px;
   }
   .totales-label {
-    width: 52px !important;
-    min-width: 52px !important;
+    width: 80px !important;
+    min-width: 80px !important;
     font-size: 0.65rem;
   }
   .columna-botones {
